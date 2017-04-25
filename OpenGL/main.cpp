@@ -37,6 +37,7 @@ static GLfloat yRot = 0.0f;
 static GLfloat zRot = 0.0f;
 static GLfloat T1 = 0.0f;
 static GLfloat R = 0.0f;
+static GLfloat T2 = 0.0f;
 
 static GLsizei lastHeight;
 static GLsizei lastWidth;
@@ -406,24 +407,31 @@ void maszyna()
 	glTranslatef(-8, 0, 10);
 	glRotatef(R, 0, 0, 1);
 	glTranslatef(8, 0, -10);
-	glPushMatrix();
-	glTranslatef(10, 0, 0); ///dorobienia klawiszy T2 na e i d
-	walec(2, 6);
-	walec2(1, 6, 0, 0, 6);
-	glPopMatrix();
-	szescian(20, 3, 3, 16, 0, 15);
-	walec(5, 10, -8, 0, 10);
-
-	glPopMatrix();
-
-	walec2(5, 70, -8, 0, -60);
 
 	glPushMatrix();
+
+	glTranslatef(T2, 0, 0);
+
+	walec(4, 12);
+	walec2(2, 12, 0, 0, 12);
+
+	glPopMatrix();
+
+	szescian(40, 6, 6, 30, 0, 30);
+	walec(10, 20, -18, 0, 20);
+
+	glPopMatrix();
+
+	walec2(10, 100, -18, 0, -80);
+
+	glPushMatrix();
+
+
 	glTranslatef(0, 0, T1);
-	szescian(26, 16, 2, 13, 0, -12);
+	szescian(52, 32, 4, 24, 0, -12);
 	glPopMatrix();
 
-	szescian(28, 22, 3, 15, 0, -57);
+	szescian(56, 50, 6, 20, 0, -86);
 }
 
 
@@ -576,8 +584,8 @@ int APIENTRY WinMain(HINSTANCE hInst,
 						// OpenGL requires WS_CLIPCHILDREN and WS_CLIPSIBLINGS
 		                WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
 					    // Window position and size
-						50, 50,
-						800, 800,
+						0, 0,
+		                (int)GetSystemMetrics(SM_CXSCREEN), (int)GetSystemMetrics(SM_CYSCREEN),
 						NULL,
 						NULL,
 						hInstance,
@@ -733,6 +741,10 @@ LRESULT CALLBACK WndProc(HWND   hWnd,
 			R -= 2.0f;
 		if (wParam == 'S')
 			R += 2.0f;
+		if (wParam == 'E')
+			T2 -= 2.0f;
+		if (wParam == 'D')
+			T2 += 2.0f;
 
 		xRot = (const int)xRot % 360;
 		yRot = (const int)yRot % 360;
