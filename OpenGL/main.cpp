@@ -404,9 +404,9 @@ void maszyna()
 {
 	glPushMatrix();
 
-	glTranslatef(-8, 0, 10);
+	glTranslatef(-18, 0, 20);
 	glRotatef(R, 0, 0, 1);
-	glTranslatef(8, 0, -10);
+	glTranslatef(18, 0, -20);
 
 	glPushMatrix();
 
@@ -733,17 +733,17 @@ LRESULT CALLBACK WndProc(HWND   hWnd,
 		if (wParam == VK_SUBTRACT)
 			zRot += 2.0f;
 
-		if (wParam == 'Q')
-			T1 -= 2.0f;
-		if (wParam == 'A')
+		if (wParam == 'Q' && T1<=6)
 			T1 += 2.0f;
-		if (wParam == 'W')
+		if (wParam == 'A' && T1>=-62)
+			T1 -= 2.0f;
+		if (wParam == 'W' && R>=-135)
 			R -= 2.0f;
-		if (wParam == 'S')
+		if (wParam == 'S' && R<=135)
 			R += 2.0f;
-		if (wParam == 'E')
+		if (wParam == 'E' && T2>=0)
 			T2 -= 2.0f;
-		if (wParam == 'D')
+		if (wParam == 'D' && T2<=64)
 			T2 += 2.0f;
 
 		xRot = (const int)xRot % 360;
@@ -806,7 +806,7 @@ BOOL APIENTRY AboutDlgProc(HWND hDlg, UINT message, UINT wParam, LONG lParam)
 		if (LOWORD(wParam) == IDOK)
 			EndDialog(hDlg, TRUE);
 	} break;
-	// Closed from sysbox
+	// Closed from sysbox7
 	case WM_CLOSE:
 		EndDialog(hDlg, TRUE);
 		break;
