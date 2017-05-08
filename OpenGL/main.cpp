@@ -32,12 +32,19 @@ HPALETTE hPalette = NULL;
 static LPCTSTR lpszAppName = "GL Template";
 static HINSTANCE hInstance;
 // Rotation amounts
-static GLfloat xRot = 0.0f;
+static GLfloat xRot = -60.0f;
 static GLfloat yRot = 0.0f;
-static GLfloat zRot = 0.0f;
+static GLfloat zRot = -20.0f;
+
+
 static GLfloat T1 = 0.0f;
 static GLfloat R = 0.0f;
 static GLfloat T2 = 0.0f;
+static GLint direction = 0;
+static GLint width = 0;
+static GLint depth = 0;
+GLint dir1 = 0;
+
 
 static GLsizei lastHeight;
 static GLsizei lastWidth;
@@ -240,7 +247,7 @@ void uklad()
 	glEnd();
 }
 // Called to draw scene
-void szescian(double a, double b, double c, double x=0, double y=0, double z=0)
+void prostopadloscian(double a, double b, double c, double x=0, double y=0, double z=0)
 {
 	glBegin(GL_QUADS);
 
@@ -400,38 +407,45 @@ void walec2(double r, double h, double x = 0, double y = 0, double z = 0)
 
 }
 
+void bryla(double a, double x = 0, double y = 0, double z = 0) {
+	double tempx = x;
+	double tempy = y;
+	double tempz = z;
+
+	for (int i = 0; i<a; i++) {
+		for (int j = 0; j < a; j++) {
+			for (int k = 0; k < a; k++) {
+				prostopadloscian(1, 1, 1, tempx, tempy, tempz);
+				tempx += 1;
+			}
+			tempx = x;
+			tempy += 1;
+		}
+		tempy = y;
+		tempz += 1;
+	}
+}
 void maszyna()
 {
 	glPushMatrix();
-
 	glTranslatef(-18, 0, 20);
 	glRotatef(R, 0, 0, 1);
 	glTranslatef(18, 0, -20);
-
 	glPushMatrix();
-
-	glTranslatef(T2, 0, 0);
-
-	walec(4, 12);
-	walec2(2, 12, 0, 0, 12);
-
+	glTranslatef(T2, 0, 0); 
+	walec(4, 12,0,0,30); //frez
+	walec2(2, 12, 0, 0, 42); //uchwyt do frezu
 	glPopMatrix();
-
-	szescian(40, 6, 6, 30, 0, 30);
-	walec(10, 20, -18, 0, 20);
-
+	prostopadloscian(40, 6, 6, 30, 0, 60); //ramie frezarki
+	walec(10, 20, -18, 0, 50); //czesc obrotowa
 	glPopMatrix();
-
-	walec2(10, 100, -18, 0, -80);
-
+	walec2(10, 100, -18, 0, -50); //pion frezarki
 	glPushMatrix();
-
-
 	glTranslatef(0, 0, T1);
-	szescian(52, 32, 4, 24, 0, -12);
+	prostopadloscian(52, 32, 4, 24, 0, 10); //stol roboczy
+	//bryla(40, 8, -7, 14);
 	glPopMatrix();
-
-	szescian(56, 50, 6, 20, 0, -86);
+	prostopadloscian(56, 50, 6, 20, 0, -56); //podstawa
 }
 
 
@@ -453,8 +467,11 @@ void RenderScene(void)
 	//Sposób na odróŸnienie "przedniej" i "tylniej" œciany wielok¹ta:
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	uklad();
+	//uklad();
+
 	maszyna();
+	
+	//bryla();
 
 	/////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////
@@ -718,8 +735,9 @@ LRESULT CALLBACK WndProc(HWND   hWnd,
 			UpdateColors(hDC);
 			return 0;
 		} break;
+
 		// Key press, check for arrow keys to do cube rotation.
-	case WM_KEYDOWN: {
+ 	case WM_KEYDOWN: {
 		if (wParam == VK_UP)
 			xRot -= 2.0f;
 		if (wParam == VK_DOWN)
@@ -733,6 +751,7 @@ LRESULT CALLBACK WndProc(HWND   hWnd,
 		if (wParam == VK_SUBTRACT)
 			zRot += 2.0f;
 
+
 		if (wParam == 'Q' && T1<=6)
 			T1 += 2.0f;
 		if (wParam == 'A' && T1>=-62)
@@ -741,9 +760,9 @@ LRESULT CALLBACK WndProc(HWND   hWnd,
 			R -= 2.0f;
 		if (wParam == 'S' && R<=135)
 			R += 2.0f;
-		if (wParam == 'E' && T2>=0)
+		if (wParam == 'E' && T2>0)
 			T2 -= 2.0f;
-		if (wParam == 'D' && T2<=64)
+		if (wParam == 'D' && T2<60)
 			T2 += 2.0f;
 
 		xRot = (const int)xRot % 360;
@@ -752,6 +771,7 @@ LRESULT CALLBACK WndProc(HWND   hWnd,
 
 		InvalidateRect(hWnd, NULL, FALSE);
 	} break;
+
 	// A menu command
 	case WM_COMMAND: {
 		switch (LOWORD(wParam)) {
@@ -769,9 +789,26 @@ LRESULT CALLBACK WndProc(HWND   hWnd,
 		}
 	} break;
 	default:   // Passes it on if unproccessed
+
 		return (DefWindowProc(hWnd, message, wParam, lParam));
 	}
 
+
+	
+	if (T2 < 60 && direction==0) {
+		T2 += 0.50f;
+		InvalidateRect(hWnd, NULL, FALSE);
+	}
+	if (T2 == 60 && direction == 0) {
+		direction = 1;
+	}
+	if (T2>0 && direction == 1) {
+		T2 -= 0.50f;
+		InvalidateRect(hWnd, NULL, FALSE);
+	}
+	if (T2 == 0 && direction == 1) {
+		direction = 0;
+	}
 	return (0L);
 }
 // Dialog procedure.
