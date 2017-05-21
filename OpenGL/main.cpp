@@ -296,6 +296,49 @@ void prostopadloscian(double a, double b, double c, double x=0, double y=0, doub
 	glEnd();
 }
 
+void prostopadloscian2(double a, double b, double c, double x = 0, double y = 0, double z = 0)
+{
+	glBegin(GL_QUADS);
+
+	glNormal3d(1, 0, 0);
+	glVertex3d(a + x, -b + y, c + z);
+	glVertex3d(a + x, -b + y, -c + z);
+	glVertex3d(a + x, b + y, -c + z);
+	glVertex3d(a + x, b + y, c + z);
+
+	glNormal3d(0, 0, -1);
+	glVertex3d(a + x, -b + y, -c + z);
+	glVertex3d(-a + x, -b + y, -c + z);
+	glVertex3d(-a + x, b + y, -c + z);
+	glVertex3d(a + x, b + y, -c + z);
+
+	glNormal3d(0, -1, 0);
+	glVertex3d(a + x, -b + y, c + z);
+	glVertex3d(-a + x, -b + y, c + z);
+	glVertex3d(-a + x, -b + y, -c + z);
+	glVertex3d(a + x, -b + y, -c + z);
+
+	glNormal3d(0, 0, 1);
+	glVertex3d(a + x, -b + y, c + z);
+	glVertex3d(a + x, b + y, c + z);
+	glVertex3d(-a + x, b + y, c + z);
+	glVertex3d(-a + x, -b + y, c + z);
+
+	glNormal3d(0, 1, 0);
+	glVertex3d(a + x, b + y, -c + z);
+	glVertex3d(-a + x, b + y, -c + z);
+	glVertex3d(-a + x, b + y, c + z);
+	glVertex3d(a + x, b + y, c + z);
+
+	glNormal3d(-1, 0, 0);
+	glVertex3d(-a + x, -b + y, -c + z);
+	glVertex3d(-a + x, -b + y, c + z);
+	glVertex3d(-a + x, b + y, c + z);
+	glVertex3d(-a + x, b + y, -c + z);
+
+	glEnd();
+}
+
 
 void walec(double r, double h, double x=0, double y=0, double z=0)
 {
@@ -407,15 +450,17 @@ void walec2(double r, double h, double x = 0, double y = 0, double z = 0)
 
 }
 
+
 void bryla(double a, double x = 0, double y = 0, double z = 0) {
 	double tempx = x;
 	double tempy = y;
 	double tempz = z;
+	glColor3f(0, 0, 0);
 
 	for (int i = 0; i<a; i++) {
 		for (int j = 0; j < a; j++) {
 			for (int k = 0; k < a; k++) {
-				prostopadloscian(1, 1, 1, tempx, tempy, tempz);
+				prostopadloscian2(1, 1, 1, tempx, tempy, tempz);
 				tempx += 1;
 			}
 			tempx = x;
@@ -425,6 +470,20 @@ void bryla(double a, double x = 0, double y = 0, double z = 0) {
 		tempz += 1;
 	}
 }
+
+void lampka()
+{
+	glColor3f(1, 0, 0);
+	prostopadloscian2(2, 2, 2, -60, 40, 80);
+}
+
+void wykrywanieKolizji()
+{
+
+	if (29 + T1 > 30 && 4+T2>7 && -4+T2<23 && (13+T2)*sin(R*3.14/180) < 11.5 && (13+T2) * sin(R*3.14 / 180) > -11.5)
+		lampka();
+}
+
 void maszyna()
 {
 	glPushMatrix();
@@ -443,7 +502,7 @@ void maszyna()
 	glPushMatrix();
 	glTranslatef(0, 0, T1);
 	prostopadloscian(52, 32, 4, 24, 0, 10); //stol roboczy
-	//bryla(40, 8, -7, 14);
+	bryla(15, 8, -7.5, 14); //bryla
 	glPopMatrix();
 	prostopadloscian(56, 50, 6, 20, 0, -56); //podstawa
 }
@@ -467,10 +526,11 @@ void RenderScene(void)
 	//Sposób na odróŸnienie "przedniej" i "tylniej" œciany wielok¹ta:
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	//uklad();
+	uklad();
 
 	maszyna();
 	
+	wykrywanieKolizji();
 	//bryla();
 
 	/////////////////////////////////////////////////////////////////
@@ -752,18 +812,18 @@ LRESULT CALLBACK WndProc(HWND   hWnd,
 			zRot += 2.0f;
 
 
-		if (wParam == 'Q' && T1<=6)
-			T1 += 2.0f;
-		if (wParam == 'A' && T1>=-62)
-			T1 -= 2.0f;
+		if (wParam == 'Q' && T1<=14)
+			T1 += 0.5f;
+		if (wParam == 'A' && T1>=-54)
+			T1 -= 0.5f;
 		if (wParam == 'W' && R>=-135)
-			R -= 2.0f;
+			R -= 0.5f;
 		if (wParam == 'S' && R<=135)
-			R += 2.0f;
+			R += 0.5f;
 		if (wParam == 'E' && T2>0)
-			T2 -= 2.0f;
+			T2 -= 0.5f;
 		if (wParam == 'D' && T2<60)
-			T2 += 2.0f;
+			T2 += 0.5f;
 
 		xRot = (const int)xRot % 360;
 		yRot = (const int)yRot % 360;
@@ -795,7 +855,7 @@ LRESULT CALLBACK WndProc(HWND   hWnd,
 
 
 	
-	if (T2 < 60 && direction==0) {
+	/*if (T2 < 60 && direction==0) {
 		T2 += 0.50f;
 		InvalidateRect(hWnd, NULL, FALSE);
 	}
@@ -808,7 +868,9 @@ LRESULT CALLBACK WndProc(HWND   hWnd,
 	}
 	if (T2 == 0 && direction == 1) {
 		direction = 0;
-	}
+	}*/
+
+
 	return (0L);
 }
 // Dialog procedure.
